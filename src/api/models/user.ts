@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-import { regExp } from "../util";
-import { Password } from "../util/password";
+import { regExp, Password } from "../util";
 import { randomBytes } from "crypto";
 
 const Schema = mongoose.Schema;
@@ -15,7 +14,7 @@ interface UserAttrs {
   avatar?: string;
   active?: boolean;
   token?: string;
-  tokenExpiration?: Date;
+  tokenExpiration?: number;
   verify?: boolean;
 }
 
@@ -29,7 +28,7 @@ export interface UserDoc extends mongoose.Document {
   avatar?: string;
   active?: boolean;
   token?: string;
-  tokenExpiration?: Date;
+  tokenExpiration?: number;
   verify?: boolean;
 }
 
@@ -59,21 +58,19 @@ const userSchema = new Schema<UserDoc>(
     },
     avatar: String,
     token: String,
+    tokenExpiration: Number,
     roles: {
       type: String,
       default: "user",
       enum: ["user", "admin", "superadmin"],
     },
     active: { type: Boolean, default: true },
-    tokenExpiration: { type: Date },
     verify: { type: Boolean, default: false },
   },
   {
     timestamps: true,
     toJSON: {
       transform(doc, ret) {
-        ret.id = doc._id;
-        delete ret._id;
         delete ret.password;
         delete ret.__v;
       },

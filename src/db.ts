@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { dbConfig } from "./config/db.config";
+import { dbConfig } from "./api/config/db.config";
 
 let url = "";
 if (process.env.NODE_ENV === "development") {

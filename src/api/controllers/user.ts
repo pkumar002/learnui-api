@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { BadRequestError, RequestValidationError } from "../errors";
+import { AuthError, BadRequestError, RequestValidationError } from "../errors";
 import { User, UserDoc } from "../models/user";
+import { Jwt, Password } from "../util";
 
 /**
  * user signin method
@@ -14,14 +15,25 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
     // existing user
-    const user = await User.findOne({
+    const user = (await User.findOne({
       $or: [{ email: email }, { mobile: email }],
-    });
+    })) as UserDoc;
 
-    if (user) {
-      const error = new Error("User not found!");
+    if (!user) {
+      const error = new BadRequestError("Email not found");
       next(error);
     }
+
+    const verify = Password.toCompare(password, user.password);
+    if (!verify) {
+      const error = new AuthError("Invalid password!");
+      next(error);
+    }
+
+    const token = Jwt.genToken(user);
+    user.token = token;
+    user.tokenExpiration = Date.now() * 60 * 60 * 1000;
+    return res.status(200).send(user);
   } catch (err) {
     next(err);
   }
@@ -59,7 +71,10 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
       roles,
     });
 
+    newUser.token = Jwt.genToken(newUser);
+    newUser.tokenExpiration = Date.now() + 60 * 60 * 1000;
     const result = await newUser.save();
+
     return res.send(result);
   } catch (err) {
     next(err);

@@ -2,7 +2,6 @@ import express from "express";
 import { signIn, signUp } from "../controllers/user";
 import { body } from "express-validator";
 import { User } from "../models/user";
-import { BadRequestError } from "../errors";
 import { validateRequest } from "../middleware/validate-request";
 import { regExp } from "../util";
 const route = express.Router();
