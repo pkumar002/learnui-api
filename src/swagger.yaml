@@ -1,0 +1,32 @@
+openapi: "3.0.0"
+
+info:
+  description: "This is a sample RESTful API has been produced to allow for easy access to a standard method for documenting a RESTful API"
+  version: "0.0.1"
+  title: "RESTful API Standard Template"
+  contact:
+    email: "b_avery@yahoo.com"
+    url: "http://bryanavery.co.uk/"
+
+servers:
+  - url: http://localhost:3001/api
+
+paths:
+  /auth:
+    post:
+      summary: Authenticate user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+
+      responses:
+        "200":
+          description: OK
